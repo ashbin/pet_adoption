@@ -39,8 +39,24 @@ class _PetDetailsPageState extends State<PetDetailsPage> {
     }
   }
 
-  void _showCelebrationToast() {
+  void _showCelebrationToast(String name) {
     confettiController.play();
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text(Strings.success),
+            content: Text("${Strings.adoptedNow} $name"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text(Strings.okay),
+              )
+            ],
+          );
+        });
   }
 
   @override
@@ -49,22 +65,26 @@ class _PetDetailsPageState extends State<PetDetailsPage> {
         bloc: _detailsBloc,
         listener: (context, state) {
           if (state is DetailsLoadCompleteState) {
-            _showCelebrationToast();
+            _showCelebrationToast(state.data.name);
           }
         },
         builder: (context, state) {
           var data = state.data;
           return WillPopScope(
-            onWillPop: () async{
+            onWillPop: () async {
               Navigator.of(context).pop(state is DetailsLoadCompleteState);
               return false;
             },
             child: Scaffold(
               appBar: AppBar(
                 title: const Text(Strings.petDetails),
-                leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: (){
-                    Navigator.of(context).pop(state is DetailsLoadCompleteState);
-                },),
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(state is DetailsLoadCompleteState);
+                  },
+                ),
               ),
               body: Stack(
                 children: [
@@ -73,10 +93,9 @@ class _PetDetailsPageState extends State<PetDetailsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          height: min(MediaQuery.of(context).size.height, MediaQuery.of(context).size.width),
-                          color:
-                              Theme.of(context).canvasColor
-                              ,
+                          height: min(MediaQuery.of(context).size.height,
+                              MediaQuery.of(context).size.width),
+                          color: Theme.of(context).canvasColor,
                           child: InkWell(
                             onTap: () => Navigator.of(context).pushNamed(
                                 AppPhotoView.routeName,
@@ -86,7 +105,9 @@ class _PetDetailsPageState extends State<PetDetailsPage> {
                                 tag: data.id,
                                 child: ColorFiltered(
                                   colorFilter: ColorFilter.mode(
-                                    data.isAvailable?Colors.transparent : Colors.grey, // or any other color
+                                    data.isAvailable
+                                        ? Colors.transparent
+                                        : Colors.grey, // or any other color
                                     BlendMode.saturation,
                                   ),
                                   child: Image.network(
@@ -108,7 +129,8 @@ class _PetDetailsPageState extends State<PetDetailsPage> {
                             children: [
                               Text(
                                 data.name,
-                                style: Theme.of(context).textTheme.displayMedium,
+                                style:
+                                    Theme.of(context).textTheme.displayMedium,
                               ),
                               const SizedBox(height: 8),
                               Text('Species: ${data.species}'),
@@ -122,27 +144,29 @@ class _PetDetailsPageState extends State<PetDetailsPage> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 60,)
+                        const SizedBox(
+                          height: 60,
+                        )
                       ],
                     ),
                   ),
                   Positioned(
                     bottom: 0,
                     left: 0,
-                      right: 0,
-
+                    right: 0,
                     child: Row(
                       children: [
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: ElevatedButton(
-                              onPressed:
-                              data.isAvailable && state is! DetailsLoadingState
+                              onPressed: data.isAvailable &&
+                                      state is! DetailsLoadingState
                                   ? () => _adoptPet(context, data)
                                   : null,
                               style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all<Color>(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
                                   data.isAvailable ? Colors.green : Colors.grey,
                                 ),
                               ),
