@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pet_adoption/src/details/presentation/pages/details_page.dart';
 import 'package:pet_adoption/src/listing/domain/entities/listing_entity.dart';
 import 'package:pet_adoption/src/utils/constants.dart';
+import 'package:pet_adoption/src/utils/strings.dart';
 
 class PetItemCard extends StatelessWidget {
   final PetItem data;
@@ -62,12 +63,14 @@ class PetItemCard extends StatelessWidget {
             trailing: Text(
               data.isAvailable
                   ? Constants.statusAvailable
-                  : Constants.statusAdopted,
+                  : Strings.alreadyAdopted,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: data.isAvailable ? Colors.green : Colors.red,
+                overflow: TextOverflow.clip,
               ),
+              maxLines: 2,
             ),
           ),
         ),
