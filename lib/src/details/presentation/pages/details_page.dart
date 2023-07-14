@@ -66,80 +66,92 @@ class _PetDetailsPageState extends State<PetDetailsPage> {
                     Navigator.of(context).pop(state is DetailsLoadCompleteState);
                 },),
               ),
-              body: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              body: Stack(
                 children: [
-                  Expanded(
-                    child: Container(
-                      color:
-                          Theme.of(context).canvasColor
-                          ,
-                      child: InkWell(
-                        onTap: () => Navigator.of(context).pushNamed(
-                            AppPhotoView.routeName,
-                            arguments: data.photoUrl),
-                        child: Center(
-                          child: Hero(
-                            tag: data.id,
-                            child: ColorFiltered(
-                              colorFilter: ColorFilter.mode(
-                                data.isAvailable?Colors.transparent : Colors.grey, // or any other color
-                                BlendMode.saturation,
-                              ),
-                              child: Image.network(
-                                data.photoUrl,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons
-                                      .image); // Placeholder icon if image fails to load
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
+                  SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          data.name,
-                          style: Theme.of(context).textTheme.displayMedium,
+                        Container(
+                          height: min(MediaQuery.of(context).size.height, MediaQuery.of(context).size.width),
+                          color:
+                              Theme.of(context).canvasColor
+                              ,
+                          child: InkWell(
+                            onTap: () => Navigator.of(context).pushNamed(
+                                AppPhotoView.routeName,
+                                arguments: data.photoUrl),
+                            child: Center(
+                              child: Hero(
+                                tag: data.id,
+                                child: ColorFiltered(
+                                  colorFilter: ColorFilter.mode(
+                                    data.isAvailable?Colors.transparent : Colors.grey, // or any other color
+                                    BlendMode.saturation,
+                                  ),
+                                  child: Image.network(
+                                    data.photoUrl,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(Icons
+                                          .image); // Placeholder icon if image fails to load
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        Text('Species: ${data.species}'),
-                        Text('Breed: ${data.breed}'),
-                        Text('Age: ${data.age}'),
-                        Text('Gender: ${data.gender}'),
-                        Text('Size: ${data.size}'),
-                        Text('Coat Color: ${data.coatColor}'),
-                        Text('Temperament: ${data.temperament}'),
-                        Text('Location: ${data.location}'),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                data.name,
+                                style: Theme.of(context).textTheme.displayMedium,
+                              ),
+                              const SizedBox(height: 8),
+                              Text('Species: ${data.species}'),
+                              Text('Breed: ${data.breed}'),
+                              Text('Age: ${data.age}'),
+                              Text('Gender: ${data.gender}'),
+                              Text('Size: ${data.size}'),
+                              Text('Coat Color: ${data.coatColor}'),
+                              Text('Temperament: ${data.temperament}'),
+                              Text('Location: ${data.location}'),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 60,)
                       ],
                     ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: ElevatedButton(
-                            onPressed:
-                                data.isAvailable && state is! DetailsLoadingState
-                                    ? () => _adoptPet(context, data)
-                                    : null,
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                data.isAvailable ? Colors.green : Colors.grey,
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                      right: 0,
+
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: ElevatedButton(
+                              onPressed:
+                              data.isAvailable && state is! DetailsLoadingState
+                                  ? () => _adoptPet(context, data)
+                                  : null,
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<Color>(
+                                  data.isAvailable ? Colors.green : Colors.grey,
+                                ),
                               ),
+                              child: const Text(Strings.adopt),
                             ),
-                            child: const Text(Strings.adopt),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
