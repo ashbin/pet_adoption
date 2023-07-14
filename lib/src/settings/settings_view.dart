@@ -48,11 +48,13 @@ class SettingsView extends StatelessWidget {
                 )
               ],
             ),
+/*
             FilledButton(
                 onPressed: () {
                   DataManager.instance().dropAll();
                 },
                 child: Text("Reset Data"))
+*/
           ],
         ),
       ),
