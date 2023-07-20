@@ -4,7 +4,7 @@ import 'package:pet_adoption/src/core/widgets/app_loader.dart';
 import 'package:pet_adoption/src/history/data/models/history_request.dart';
 import 'package:pet_adoption/src/history/presentation/bloc/history_bloc.dart';
 import 'package:pet_adoption/src/history/presentation/widgets/history_item_card.dart';
-
+import 'package:pet_adoption/src/utils/constants.dart';
 import 'package:pet_adoption/src/utils/dimens.dart';
 import 'package:pet_adoption/src/utils/strings.dart';
 
@@ -27,7 +27,8 @@ class _HistoryPageState extends State<HistoryPage> {
     scrollController = ScrollController();
     scrollController.addListener(onScroll);
     _historyBloc.add(LoadHistoryEvent(
-      request: HistoryRequest(page: 1, pageSize: 10),
+      request: HistoryRequest(
+          page: Constants.listStartPage, pageSize: Constants.listPageSize),
     ));
     super.initState();
   }
@@ -38,6 +39,7 @@ class _HistoryPageState extends State<HistoryPage> {
     _historyBloc.close();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,11 +57,13 @@ class _HistoryPageState extends State<HistoryPage> {
             case HistoryEmptyState:
               return Center(
                   child: Column(
-                    children: [
-                      Text(Strings.adoptionHistoryEmpty),
-                      OutlinedButton(onPressed: () => Navigator.of(context).pop(), child: Text("Go Back To Home"))
-                    ],
-                  ));
+                children: [
+                  const Text(Strings.adoptionHistoryEmpty),
+                  OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text(Strings.goBackToHome))
+                ],
+              ));
             case HistoryErrorState:
               return Center(
                   child: Text((state as HistoryErrorState).error ?? ""));
@@ -91,26 +95,6 @@ class _HistoryPageState extends State<HistoryPage> {
       },
       scrollDirection: Axis.vertical,
       controller: scrollController,
-    );
-  }
-
-  SliverAppBar buildSliverAppBar(BuildContext context) {
-    return SliverAppBar(
-      leading: SizedBox(),
-      leadingWidth: 0,
-      floating: true,
-      pinned: false,
-      snap: true,
-      centerTitle: false,
-      title: const Text('Petta'),
-      actions: [
-        IconButton(
-          icon: CircleAvatar(
-              backgroundColor: Theme.of(context).indicatorColor,
-              child: const Icon(Icons.person)),
-          onPressed: () {},
-        ),
-      ],
     );
   }
 

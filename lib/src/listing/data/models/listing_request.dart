@@ -8,7 +8,11 @@ class ListingRequest extends Equatable {
   int pageSize;
 
   ListingRequest(
-      {this.query, this.species, this.location, this.page=1, required this.pageSize});
+      {this.query,
+      this.species,
+      this.location,
+      this.page = 1,
+      required this.pageSize});
 
   @override
   List<Object?> get props => [query, species, location, pageSize, page];

@@ -3,6 +3,8 @@ import 'package:pet_adoption/src/details/presentation/pages/details_page.dart';
 import 'package:pet_adoption/src/history/domain/entities/history_entity.dart';
 import 'package:pet_adoption/src/listing/domain/entities/listing_entity.dart'
     as listing;
+import 'package:pet_adoption/src/utils/dimens.dart';
+import 'package:pet_adoption/src/utils/strings.dart';
 
 class HistoryItemCard extends StatelessWidget {
   final PetItem data;
@@ -31,45 +33,36 @@ class HistoryItemCard extends StatelessWidget {
       },
       child: Card(
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(Dimens.dimen8),
           child: ListTile(
             leading: CircleAvatar(
-              radius: 30,
+              radius: Dimens.dimen30,
               backgroundImage: NetworkImage(data.photoUrl),
             ),
             title: Text(
-              // tag: "${data.id}_name",
               data.name,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Species: ${data.species}',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                Text(
-                  'Breed: ${data.breed}',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                Text(
-                  'Age: ${data.age}',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                Text(
-                  'Gender: ${data.gender}',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                Text(
-                  'Coat Color: ${data.coatColor}',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+                buildText(context, '${Strings.species}: ${data.species}'),
+                buildText(context, '${Strings.breed}: ${data.breed}'),
+                buildText(context, '${Strings.age}: ${data.age}'),
+                buildText(context, '${Strings.gender}: ${data.gender}'),
+                buildText(context, '${Strings.coatColor}: ${data.coatColor}'),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Text buildText(BuildContext context, String text) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.bodyMedium,
     );
   }
 }

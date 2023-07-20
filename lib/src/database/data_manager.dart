@@ -11,6 +11,21 @@ class DataManager {
   final String tablePet = 'pets';
   final String tableAdoptions = 'adoptions';
 
+  final String columnId = 'id';
+  final String columnName = 'name';
+  final String columnSpecies = 'species';
+  final String columnBreed = 'breed';
+  final String columnAge = 'age';
+  final String columnGender = 'gender';
+  final String columnSize = 'size';
+  final String columnCoatColor = 'coatColor';
+  final String columnTemperament = 'temperament';
+  final String columnPhotoUrl = 'photoUrl';
+  final String columnLocation = 'location';
+  final String columnAdoptionStatus = 'adoptionStatus';
+  final String columnPetId = 'petId';
+  final String columnDateOfAdoption = 'dateOfAdoption';
+
   factory DataManager.instance() => _instance;
 
   @visibleForTesting
@@ -25,11 +40,11 @@ class DataManager {
         onCreate: (db, version) {
       // Create the pets table.
       db.execute(
-          'CREATE TABLE $tablePet (id INTEGER PRIMARY KEY, name TEXT, species TEXT, breed TEXT, age INTEGER, gender TEXT, size TEXT, coatColor TEXT, temperament TEXT, photoUrl TEXT, location TEXT, adoptionStatus TEXT)');
+          'CREATE TABLE $tablePet ($columnId INTEGER PRIMARY KEY, $columnName TEXT, $columnSpecies TEXT, $columnBreed TEXT, $columnAge INTEGER, $columnGender TEXT, $columnSize TEXT, $columnCoatColor TEXT, $columnTemperament TEXT, $columnPhotoUrl TEXT, $columnLocation TEXT, $columnAdoptionStatus TEXT)');
 
       // Create the adoptions table.
       db.execute(
-          'CREATE TABLE $tableAdoptions (id INTEGER PRIMARY KEY AUTOINCREMENT, petId INTEGER, dateOfAdoption TEXT)');
+          'CREATE TABLE $tableAdoptions ($columnId INTEGER PRIMARY KEY AUTOINCREMENT, $columnPetId INTEGER, $columnDateOfAdoption TEXT)');
     });
     var list = await _db.query(tablePet, limit: 1);
     if (list.isEmpty) {
@@ -55,7 +70,8 @@ class DataManager {
     List<dynamic> params = [];
     if (query != null && query.isNotEmpty) {
       var likeQuery = "%$query%";
-      sqlCondition = 'WHERE (name LIKE ? OR species LIKE ? OR breed LIKE ?) ';
+      sqlCondition =
+          'WHERE ($columnName LIKE ? OR $columnSpecies LIKE ? OR $columnBreed LIKE ?) ';
       params.addAll([likeQuery, likeQuery, likeQuery]);
     }
     if (species != null && species.isNotEmpty) {
@@ -64,7 +80,7 @@ class DataManager {
       } else {
         sqlCondition += ' WHERE ';
       }
-      sqlCondition += ' species = ? ';
+      sqlCondition += ' $columnSpecies = ? ';
       params.add(species);
     }
     if (location != null && location.isNotEmpty) {
@@ -73,11 +89,11 @@ class DataManager {
       } else {
         sqlCondition += ' WHERE ';
       }
-      sqlCondition += ' location = ? ';
+      sqlCondition += ' $columnLocation = ? ';
       params.add(location);
     }
     sql += sqlCondition;
-    sql += ' ORDER BY id DESC LIMIT ? OFFSET ? ';
+    sql += ' ORDER BY $columnId DESC LIMIT ? OFFSET ? ';
     params.addAll([pageSize, (page! - 1) * pageSize!]);
 
     print("SQL :: $sql || values :: $params ");
@@ -109,39 +125,40 @@ class DataManager {
   }
 
   Future<Pet?> markAdopted(int petId, DateTime dateOfAdoption) async {
-    var petsList = await getPetsByCriteria({'id': petId});
-    if(petsList.isEmpty){
+    var petsList = await getPetsByCriteria({columnId: petId});
+    if (petsList.isEmpty) {
       return null;
     }
     var pet = petsList.first;
     pet.adoptionStatus = Constants.statusAdopted;
     var batch = _db.batch();
-    batch.insert(tableAdoptions,
-        {'petId': pet.id, "dateOfAdoption": dateOfAdoption.toIso8601String()});
+    batch.insert(tableAdoptions, {
+      columnPetId: pet.id,
+      columnDateOfAdoption: dateOfAdoption.toIso8601String()
+    });
     batch.update(
       tablePet,
       pet.toMap(),
-      where: 'id =?',
+      where: '$columnId =?',
       whereArgs: [pet.id],
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     try {
       await batch.commit();
       return pet;
-    } catch(e){
+    } catch (e) {
       return null;
     }
   }
 
-
   Future<List<Pet>> getHistoryPaginated(
-      {        int? page = 1,
-        int? pageSize = 10}) async {
+      {int? page = 1, int? pageSize = 10}) async {
     List<Pet> pets = [];
 
-    String sql = 'SELECT * FROM $tableAdoptions left join $tablePet ON $tableAdoptions.petId = $tablePet.id ';
+    String sql =
+        'SELECT * FROM $tableAdoptions left join $tablePet ON $tableAdoptions.$columnPetId = $tablePet.$columnId ';
     List<dynamic> params = [];
-    sql += ' ORDER BY id DESC LIMIT ? OFFSET ? ';
+    sql += ' ORDER BY $columnId DESC LIMIT ? OFFSET ? ';
     params.addAll([pageSize, (page! - 1) * pageSize!]);
 
     print("SQL :: $sql || values :: $params ");
@@ -165,7 +182,7 @@ class DataManager {
     await batch.commit(noResult: true);
   }
 
-  Future<void> dropAll() async{
+  Future<void> dropAll() async {
     _db.delete(tableAdoptions);
     _db.delete(tablePet);
     await _insertSampleData();

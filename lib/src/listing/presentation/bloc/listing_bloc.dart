@@ -5,6 +5,7 @@ import 'package:pet_adoption/src/listing/data/models/listing_request.dart';
 import 'package:pet_adoption/src/listing/data/repositories/listing_repo_impl.dart';
 import 'package:pet_adoption/src/listing/domain/entities/listing_entity.dart';
 import 'package:pet_adoption/src/listing/domain/usecases/listing_usecase.dart';
+import 'package:pet_adoption/src/utils/constants.dart';
 import 'package:pet_adoption/src/utils/strings.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -14,19 +15,15 @@ part 'listing_states.dart';
 
 class ListingBloc extends Bloc<ListingEvent, ListingState> {
   ListingRequest? _request;
-  final pageSize = 10;
 
   ListingBloc(ListingState initialState) : super(initialState) {
-
     on<LoadListingEvent>((event, emit) async {
       _request = event.request;
       await loadRequest(emit, event.request, []);
     });
 
     on<LoadListingMoreEvent>((event, emit) async {
-      print("On load more event");
       if (state is! ListingLoadCompleteState) {
-        // emit(ListingLoadingState());
         print("On load more event : not complete stae");
         return;
       }
@@ -46,7 +43,9 @@ class ListingBloc extends Bloc<ListingEvent, ListingState> {
     });
 
     on<SearchListingEvent>((event, emit) async {
-      var request = _request ?? ListingRequest(page: 1, pageSize: pageSize);
+      var request = _request ??
+          ListingRequest(
+              page: Constants.listStartPage, pageSize: Constants.listPageSize);
       request.page = 1;
       request.query = event.query;
 
@@ -59,12 +58,11 @@ class ListingBloc extends Bloc<ListingEvent, ListingState> {
     });
 
     on<RefreshListingEvent>((event, emit) async {
-      if(_request != null) {
+      if (_request != null) {
         _request!.page = 1;
         await loadRequest(emit, _request!, []);
       }
     });
-
   }
 
   Future<void> loadRequest(Emitter<ListingState> emit, ListingRequest request,
@@ -77,8 +75,9 @@ class ListingBloc extends Bloc<ListingEvent, ListingState> {
 
       if (result.success) {
         var data = currentResult ?? [];
-        bool canLoadMore = (result.data?.list != null &&     result.data!.list.length == request.pageSize);
-        if (result.data?.list != null ){
+        bool canLoadMore = (result.data?.list != null &&
+            result.data!.list.length == request.pageSize);
+        if (result.data?.list != null) {
           data.addAll(result.data!.list);
         }
         emit(ListingLoadCompleteState(

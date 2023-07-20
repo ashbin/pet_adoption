@@ -1,9 +1,6 @@
-
 part of 'history_bloc.dart';
 
-abstract class HistoryState extends Equatable {
-
-}
+abstract class HistoryState extends Equatable {}
 
 class HistoryLoadingState extends HistoryState {
   @override
@@ -11,29 +8,22 @@ class HistoryLoadingState extends HistoryState {
 }
 
 class HistoryLoadCompleteState extends HistoryState {
-   List<PetItem> list;
-   HistoryRequest request;
-  bool canLoadMore = true;
+  final List<PetItem> list;
+  final HistoryRequest request;
+  final bool canLoadMore;
 
-
-  HistoryLoadCompleteState({
-    required this.list,
-    required this.request,
-    this.canLoadMore = true
-  });
+  HistoryLoadCompleteState(
+      {required this.list, required this.request, this.canLoadMore = true});
 
   @override
   List<Object?> get props => [list, request, canLoadMore];
 }
+
 class HistoryEmptyState extends HistoryState {
-  HistoryRequest request;
-  bool canLoadMore = true;
+  final HistoryRequest request;
+  final bool canLoadMore;
 
-
-  HistoryEmptyState({
-    required this.request,
-    this.canLoadMore = true
-  });
+  HistoryEmptyState({required this.request, this.canLoadMore = true});
 
   @override
   List<Object?> get props => [request, canLoadMore];

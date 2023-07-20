@@ -13,20 +13,15 @@ part 'history_events.dart';
 part 'history_states.dart';
 
 class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
-  HistoryRequest? _request;
-  final pageSize = 10;
-
   HistoryBloc(HistoryState initialState) : super(initialState) {
-
     on<LoadHistoryEvent>((event, emit) async {
-      _request = event.request;
       await loadRequest(emit, event.request, []);
     });
 
     on<LoadHistoryMoreEvent>((event, emit) async {
+      //todo implement logger
       print("On load more event");
       if (state is! HistoryLoadCompleteState) {
-        // emit(ListingLoadingState());
         print("On load more event : not complete stae");
         return;
       }
@@ -37,7 +32,6 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
       }
       var request = currentState.request;
       request.page = request.page + 1;
-      _request = request;
       await loadRequest(emit, request, currentState.list);
     }, transformer: (events, mapper) {
       return events
@@ -50,19 +44,20 @@ class HistoryBloc extends Bloc<HistoryEvent, HistoryState> {
       List<PetItem>? currentResult) async {
     emit(HistoryLoadingState());
     try {
-      var result = await FetchHistoryUseCase(
-              HistoryRepositoryImpl(LocalDataSource()))
-          .call(request: request);
+      var result =
+          await FetchHistoryUseCase(HistoryRepositoryImpl(LocalDataSource()))
+              .call(request: request);
 
       if (result.success) {
         var data = currentResult ?? [];
-        bool canLoadMore = (result.data?.list != null &&     result.data!.list.length == request.pageSize);
-        if (result.data?.list != null ){
+        bool canLoadMore = (result.data?.list != null &&
+            result.data!.list.length == request.pageSize);
+        if (result.data?.list != null) {
           data.addAll(result.data!.list);
         }
-        if(data.isEmpty){
+        if (data.isEmpty) {
           emit(HistoryEmptyState(request: request, canLoadMore: false));
-        }else {
+        } else {
           emit(HistoryLoadCompleteState(
               list: data, request: request, canLoadMore: canLoadMore));
         }

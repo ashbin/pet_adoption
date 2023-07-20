@@ -11,7 +11,6 @@ class LocalDataSource implements DataSource {
     int? page,
     int? pageSize,
   }) async {
-    print("LocalDataSource :: getPets $query $species $location $page $pageSize");
     try {
       return DataManager.instance().getPetsPaginated(
           query: query,
@@ -19,7 +18,7 @@ class LocalDataSource implements DataSource {
           species: species,
           page: page,
           pageSize: pageSize);
-    }catch(e){
+    } catch (e) {
       print(e);
       return null;
     }

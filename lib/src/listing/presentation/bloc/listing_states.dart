@@ -11,9 +11,9 @@ class ListingLoadingState extends ListingState {
 }
 
 class ListingLoadCompleteState extends ListingState {
-   List<PetItem> list;
-   ListingRequest request;
-  bool canLoadMore = true;
+   final List<PetItem> list;
+   final ListingRequest request;
+  final bool canLoadMore;
 
 
   ListingLoadCompleteState({
@@ -22,14 +22,6 @@ class ListingLoadCompleteState extends ListingState {
     this.canLoadMore = true
   });
 
-  // ListingLoadCompleteState copyWith(
-  //     {
-  //   ListingData? data,
-  // }) {
-  //   return ListingLoadCompleteState(
-  //     data: data ?? this.data, page: page,
-  //   );
-  // }
 
   @override
   List<Object?> get props => [list, request, canLoadMore];

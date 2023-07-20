@@ -6,6 +6,7 @@ import 'package:pet_adoption/src/listing/data/models/listing_request.dart';
 import 'package:pet_adoption/src/listing/presentation/bloc/listing_bloc.dart';
 import 'package:pet_adoption/src/listing/presentation/widgets/pet_item_card.dart';
 import 'package:pet_adoption/src/settings/settings_view.dart';
+import 'package:pet_adoption/src/utils/constants.dart';
 import 'package:pet_adoption/src/utils/dimens.dart';
 import 'package:pet_adoption/src/utils/strings.dart';
 
@@ -19,27 +20,29 @@ class ListingPage extends StatefulWidget {
 }
 
 class _ListingPageState extends State<ListingPage> {
-  late ListingBloc _listingBloc;
-  late ScrollController scrollController;
+  final scrollThreshold = 300;
 
+  late ListingBloc _listingBloc;
+  late ScrollController _scrollController;
   late TextEditingController _searchTextController;
 
   @override
   void dispose() {
     _searchTextController.dispose();
-    scrollController.dispose();
+    _scrollController.dispose();
     _listingBloc.close();
     super.dispose();
   }
 
   @override
   void initState() {
-    scrollController = ScrollController();
+    _scrollController = ScrollController();
     _searchTextController = TextEditingController();
     _listingBloc = ListingBloc(ListingLoadingState());
-    scrollController.addListener(onScroll);
+    _scrollController.addListener(onScroll);
     _listingBloc.add(LoadListingEvent(
-      request: ListingRequest(page: 1, pageSize: 10),
+      request: ListingRequest(
+          page: Constants.listStartPage, pageSize: Constants.listPageSize),
     ));
     _searchTextController.addListener(onSearch);
     super.initState();
@@ -89,24 +92,27 @@ class _ListingPageState extends State<ListingPage> {
             );
           }
         } else {
-          return PetItemCard(data: currentState.list[index], onAdopted: (){
-            _refreshPage(index);
-          },);
+          return PetItemCard(
+            data: currentState.list[index],
+            onAdopted: () {
+              _refreshPage(index);
+            },
+          );
         }
       },
       scrollDirection: Axis.vertical,
-      controller: scrollController,
+      controller: _scrollController,
     );
   }
 
   SliverAppBar buildSliverAppBar(BuildContext context) {
     return SliverAppBar(
-      leading: SizedBox(),
+      leading: const SizedBox(),
       leadingWidth: 0,
       floating: true,
       pinned: false,
       snap: true,
-      title: const Text('Petta'),
+      title: const Text(Strings.appName),
       actions: [
         IconButton(
           icon: const Icon(Icons.history),
@@ -146,9 +152,9 @@ class _ListingPageState extends State<ListingPage> {
   }
 
   void onScroll() {
-    final maxScroll = scrollController.position.maxScrollExtent;
-    final currentScroll = scrollController.position.pixels;
-    if (maxScroll - currentScroll < 300) {
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    if (maxScroll - currentScroll < scrollThreshold) {
       _listingBloc.add(LoadListingMoreEvent());
     }
   }
